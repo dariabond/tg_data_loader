@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    env_file: .env
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    depends_on:
+      - postgres
+    env_file: .env
+    volumes:
+      - ./src:/app/src
+      - ./sessions:/app/sessions
+    stdin_open: true
+    tty: true
+
+volumes:
+  postgres_data:
