@@ -2,6 +2,7 @@ import asyncio
 from telethon import TelegramClient
 import os
 from dotenv import load_dotenv
+from location_extractor import LocationExtractor
 
 load_dotenv()
 
@@ -15,23 +16,17 @@ async def test_telegram():
     await client.start(phone=phone)
     print("✓ Connected to Telegram!")
     
-    # Test: Get your dialogs
-    print("\nYour recent chats:")
-    async for dialog in client.iter_dialogs(limit=5):
-        print(f"  - {dialog.name}")
-    
-    # Test: Ask for a channel to check
-    channel_username = input("\nEnter a public channel username (without @): ")
+    channel_username = os.getenv('TG_CHANNEL')
+
+    location_extractor = LocationExtractor()
     
     try:
         channel = await client.get_entity(channel_username)
-        print(f"\n✓ Found channel: {channel.title}")
         
-        print("\nLast 3 messages:")
-        async for message in client.iter_messages(channel, limit=3):
+        async for message in client.iter_messages(channel, limit=10):
             print(f"\n  Date: {message.date}")
-            print(f"  Text: {message.text[:100] if message.text else '[No text]'}...")
-            print(f"  Views: {message.views}")
+            print(f"  Text: {message.text if message.text else '[No text]'}")
+            message_location = location_extractor.get_location(message.text)
             
     except Exception as e:
         print(f"✗ Error: {e}")
