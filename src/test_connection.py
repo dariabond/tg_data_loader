@@ -35,3 +35,25 @@ async def test_telegram():
 
 if __name__ == '__main__':
     asyncio.run(test_telegram())
+
+    """
+    # create tables: event, settlement, threat_type(or as a field of event)
+    # identify one or multiple threats  
+    # region(oblast) should be stored in file as a static data
+     
+    DB tables
+    event
+    - id PK
+    - date (R)
+    - threat type (каб, бпла, балістична ракета, крилата ракета, Кинджал) (R)
+    - amount (2/5/group/None) (NR)
+    - city_id (NR)
+    - region_key (R)
+
+    city 
+    - id PK
+    - name (R)
+    - region_key (R)
+    - lat (R)
+    - long (R)
+    """
