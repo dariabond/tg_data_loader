@@ -23,7 +23,7 @@ async def test_telegram():
     try:
         channel = await client.get_entity(channel_username)
         
-        async for message in client.iter_messages(channel, limit=10):
+        async for message in client.iter_messages(channel, limit=30):
             print(f"\n  Date: {message.date}")
             print(f"  Text: {message.text if message.text else '[No text]'}")
             message_location = location_extractor.get_location(message.text)
@@ -36,10 +36,14 @@ async def test_telegram():
 if __name__ == '__main__':
     asyncio.run(test_telegram())
 
-    """
-    # create tables: event, settlement, threat_type(or as a field of event)
-    # identify one or multiple threats  
+    """TODO
+    # create tables: event, settlement, threat_type
+    # identify one or multiple threats and cut it off(to avoid this case 🛵🛸 Активність ворожих розвідувальних та ударних БпЛА на півночі Харківщини.
+['Миколаєвом', 'Сумському', 'Криворізькому', 'Харківщини', 'БпЛА в Сумському', 'БпЛА в Криворізькому'])
     # region(oblast) should be stored in file as a static data
+    # create tests 
+    # exceptions to not take into account
+    # extract settlement or region name Харкова -> Харків
      
     DB tables
     event
