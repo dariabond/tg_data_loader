@@ -3,6 +3,7 @@ from telethon import TelegramClient
 import os
 from dotenv import load_dotenv
 from location_extractor import LocationExtractor
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -10,23 +11,35 @@ api_id = os.getenv('TELEGRAM_API_ID')
 api_hash = os.getenv('TELEGRAM_API_HASH')
 phone = os.getenv('TELEGRAM_PHONE')
 
+async def get_messages(client, channel, hours=24, limit=500):
+    cutoff_time = datetime.now() - timedelta(hours=hours)
+    print(cutoff_time)
+    messages = []
+    async for message in client.iter_messages(
+        channel, 
+        offset_date=cutoff_time,
+        limit=limit,
+        reverse=True
+    ):
+        messages.append(message)
+    print(f'Messages len: {len(messages)}')
+    return messages
+
+
 async def test_telegram():
     client = TelegramClient('sessions/test_session', api_id, api_hash)
-    
     await client.start(phone=phone)
-    print("✓ Connected to Telegram!")
-    
     channel_username = os.getenv('TG_CHANNEL')
 
     location_extractor = LocationExtractor()
-    
     try:
         channel = await client.get_entity(channel_username)
+        cutoff_time = datetime.now() - timedelta(hours=8)
         
-        async for message in client.iter_messages(channel, limit=30):
+        messages = await get_messages(client, channel, hours=24)
+        for message in messages:
             print(f"\n  Date: {message.date}")
             print(f"  Text: {message.text if message.text else '[No text]'}")
-            message_location = location_extractor.get_location(message.text)
             
     except Exception as e:
         print(f"✗ Error: {e}")
@@ -61,3 +74,5 @@ if __name__ == '__main__':
     - lat (R)
     - long (R)
     """
+
+    # ASK ABOUT ACCURACY!!!
