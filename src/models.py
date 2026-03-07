@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Optional
 
 @dataclass
 class Location:
@@ -40,5 +41,5 @@ class ParsedMessage:
     message_id: int
     message_date: datetime
     message_text: str
-    locations: List[Locations]
-    threats: List[Threats]
+    locations: list[str]
+    #threats: list[Threat]

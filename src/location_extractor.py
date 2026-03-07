@@ -32,6 +32,7 @@ class LocationExtractor:
             potential_locations.extend(matches)
 
         print(potential_locations)
+        return potential_locations
 
 
 '''SPECIAL CASES'''
@@ -39,6 +40,8 @@ class LocationExtractor:
     Text: 🛵 Через Сумщину БпЛА ➡️ у напрямку Чернігівщини.
     Extracting location from message :🛵 Через Сумщину БпЛА ➡️ у напрямку Чернігівщини.
     ['Сумщину БпЛА', 'Чернігівщини']
+
+    '🛵 Дніпропетровщина: БпЛА ➡️ повз Губиниху, курсом на захід.\n🛵 Чернігівщина: БпЛА ➡️ у напрямку Мени, Сосниці.\n🛵 Полтавщина: групи БпЛА ➡️ повз Велику Багачку, курсом на південний захід.'
 '''
 
 '''

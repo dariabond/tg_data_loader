@@ -2,8 +2,8 @@ import asyncio
 from telethon import TelegramClient
 import os
 from dotenv import load_dotenv
-from location_extractor import LocationExtractor
 from datetime import datetime, timedelta
+from message_parser import MessageParser
 
 load_dotenv()
 
@@ -11,7 +11,8 @@ api_id = os.getenv('TELEGRAM_API_ID')
 api_hash = os.getenv('TELEGRAM_API_HASH')
 phone = os.getenv('TELEGRAM_PHONE')
 
-async def get_messages(client, channel, hours=24, limit=500):
+
+async def get_messages(client, channel, hours=24, limit=1):
     cutoff_time = datetime.now() - timedelta(hours=hours)
     print(cutoff_time)
     messages = []
@@ -30,21 +31,23 @@ async def test_telegram():
     client = TelegramClient('sessions/test_session', api_id, api_hash)
     await client.start(phone=phone)
     channel_username = os.getenv('TG_CHANNEL')
+    parser = MessageParser()
 
-    location_extractor = LocationExtractor()
     try:
         channel = await client.get_entity(channel_username)
         cutoff_time = datetime.now() - timedelta(hours=8)
         
         messages = await get_messages(client, channel, hours=24)
         for message in messages:
-            print(f"\n  Date: {message.date}")
-            print(f"  Text: {message.text if message.text else '[No text]'}")
+            res = parser.parse(message)
+            print("RESULT OF PARSING")
+            print(res)
             
     except Exception as e:
         print(f"✗ Error: {e}")
     
     await client.disconnect()
+
 
 if __name__ == '__main__':
     asyncio.run(test_telegram())
@@ -55,8 +58,9 @@ if __name__ == '__main__':
 ['Миколаєвом', 'Сумському', 'Криворізькому', 'Харківщини', 'БпЛА в Сумському', 'БпЛА в Криворізькому'])
     # region(oblast) should be stored in file as a static data
     # create tests 
-    # exceptions to not take into account
+    # exceptions to not take into account(fe messages that have image)
     # extract settlement or region name Харкова -> Харків
+    # extract quantity
      
     DB tables
     event
