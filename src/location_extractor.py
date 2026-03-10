@@ -1,11 +1,14 @@
 import re
 from geopy.geocoders import Nominatim
 from location_config import LOCATION_CONFIG
+from models import Location
+import time
 
-# TODO assemble all regex in separate method
-# are there private methods in Py?
-# extract threat first
-# extract only from those that have length <40
+# try Nominatim for location normalization
+# add Location object
+# TODO assemble all regex in separate method in LE
+# extract threat first and slice text
+
 class LocationExtractor: 
     def __init__(self):
         self.geolocator = Nominatim(user_agent="telegram_scraper_v1")
@@ -22,6 +25,23 @@ class LocationExtractor:
         )
         print(LOCATION_CONFIG)
 
+    # this method verifies if text is real location and returns 
+    # normalized settlement name, latitude, longitude
+    def _geocode_location(self, text): 
+        print('GEOCODE_LOCATION method called')
+        try: 
+            time.sleep(1)
+            location = self.geolocator.geocode(text, addressdetails=True)
+            if location:
+                address = location.raw.get('address', {})
+                print(address.get('city'))
+        
+        except (GeocoderTimedOut, GeocoderServiceError) as e:
+            print(f"Geocoding error for '{location_name}': {e}")
+        except Exception as e:
+            print(f"Unexpected error for '{location_name}': {e}")
+        
+        return None
 
     def get_location(self, text):
         print(f'Extracting location from message :{text}')
@@ -31,7 +51,12 @@ class LocationExtractor:
             matches = re.findall(pattern, text)
             potential_locations.extend(matches)
 
+        locations = []
+        for item in potential_locations: 
+            self._geocode_location(item)
+
         print(potential_locations)
+
         return potential_locations
 
 
