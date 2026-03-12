@@ -12,7 +12,7 @@ api_hash = os.getenv('TELEGRAM_API_HASH')
 phone = os.getenv('TELEGRAM_PHONE')
 
 
-async def get_messages(client, channel, hours=24, limit=1):
+async def get_messages(client, channel, hours=24, limit=20):
     cutoff_time = datetime.now() - timedelta(hours=hours)
     print(cutoff_time)
     messages = []
@@ -23,7 +23,6 @@ async def get_messages(client, channel, hours=24, limit=1):
         reverse=True
     ):
         messages.append(message)
-    print(f'Messages len: {len(messages)}')
     return messages
 
 
@@ -56,11 +55,11 @@ if __name__ == '__main__':
     # create tables: event, settlement, threat_type
     # identify one or multiple threats and cut it off(to avoid this case 🛵🛸 Активність ворожих розвідувальних та ударних БпЛА на півночі Харківщини.
 ['Миколаєвом', 'Сумському', 'Криворізькому', 'Харківщини', 'БпЛА в Сумському', 'БпЛА в Криворізькому'])
-    # region(oblast) should be stored in file as a static data
     # create tests 
     # exceptions to not take into account(fe messages that have image)
     # extract settlement or region name Харкова -> Харків
     # extract quantity
+    # think over the how to store settlements in db
      
     DB tables
     event

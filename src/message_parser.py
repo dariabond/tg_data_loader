@@ -1,7 +1,10 @@
 from location_extractor import LocationExtractor
 from models import ParsedMessage
 
-# TODO create class for threat and for location
+# TODO process messages that do not contain images AND
+# do not contain 'Збито/подавлено' and other patterns to avoid
+# try parser with patterns for both threat + location
+# test which one works better 
 class MessageParser:
 
     def __init__(self):
