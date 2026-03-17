@@ -4,9 +4,7 @@ from .location_config import LOCATION_CONFIG
 from .models import Location
 import time
 
-# add Location object
-# TODO assemble all regex in separate method in LE
-# extract threat first and slice text
+# extract threat first and slice the text
 
 class LocationParser: 
     def __init__(self):

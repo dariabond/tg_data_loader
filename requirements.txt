@@ -3,3 +3,4 @@ asyncpg==0.29.0
 python-dotenv==1.0.0
 geopy==2.4.1
 pycountry==23.12.11
+pytest==9.0.2

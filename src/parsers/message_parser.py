@@ -1,5 +1,5 @@
 import re
-from parsers.location_parser import LocationParser
+from .location_parser import LocationParser
 from .models import ParsedMessage
 
 # TODO process messages that do not contain images AND

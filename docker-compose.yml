@@ -15,6 +15,7 @@ services:
     volumes:
       - ./src:/app/src
       - ./sessions:/app/sessions
+      - ./test:/app/test
     stdin_open: true
     tty: true
 
