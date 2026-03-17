@@ -3,7 +3,7 @@ from telethon import TelegramClient
 import os
 from dotenv import load_dotenv
 from datetime import datetime, timedelta
-from message_parser import MessageParser
+from parsers.message_parser import MessageParser
 
 load_dotenv()
 
