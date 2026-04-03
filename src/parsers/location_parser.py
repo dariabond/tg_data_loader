@@ -1,6 +1,6 @@
 import re
 from geopy.geocoders import Nominatim
-from .location_config import LOCATION_CONFIG
+from .parser_config import PARSER_CONFIG
 from .models import Location
 import time
 
@@ -10,23 +10,21 @@ class LocationParser:
     def __init__(self):
         self.geolocator = Nominatim(user_agent="telegram_scraper_v1")
         self.patterns = []
-        prepositions = '|'.join(LOCATION_CONFIG['prepos_space'])
-        postpositions = '|'.join(LOCATION_CONFIG['postpos'])
+        prepositions = '|'.join(PARSER_CONFIG['prepos_space'])
 
         self.patterns.extend([
-            LOCATION_CONFIG['pattern_prepos'].format(
+            PARSER_CONFIG['pattern_prepos'].format(
                 prepositions=prepositions
             ),
-            LOCATION_CONFIG['pattern_postpos']
-        ]
-        )
+            PARSER_CONFIG['pattern_postpos']
+        ])
 
     # this method verifies if text is real location and returns 
     # normalized settlement name, latitude, longitude
     def _geocode_location(self, text): 
         print(f'GEOCODE_LOCATION method called with text: {text}')
         try: 
-            time.sleep(1)
+            time.sleep(2)
             location = self.geolocator.geocode(text)
             if location:
                 address = location.raw.get("address", {})
@@ -52,8 +50,10 @@ class LocationParser:
             potential_locations.extend(matches)
 
         locations = []
-        for item in potential_locations: 
-            self._geocode_location(item)
+        """for item in potential_locations: 
+            print(f"Geocoded locations")
+            print(self._geocode_location(item))"""
+            
 
         print(potential_locations)
 

@@ -1,24 +1,41 @@
 import re
 from .location_parser import LocationParser
-from .models import ParsedMessage
+from .parser_config import PARSER_CONFIG
 
-# TODO process messages that do not contain images AND
-# do not contain 'Збито/подавлено' and other patterns to avoid
-# try parser with patterns for both threat + location
-# test which one works better 
+
 class MessageParser:
 
     def __init__(self):
         self.location_extractor = LocationParser()
+        self.patterns = []
+        prepositions = '|'.join(PARSER_CONFIG['prepos_space'])
+        print(PARSER_CONFIG['compound_pattern'])
+        print(prepositions)
+        self.patterns.extend([
+            PARSER_CONFIG['compound_pattern'].format(
+                prepositions=prepositions
+            )
+        ])
 
     def parse(self, message):
         # leave only latin, cyrillic and digits
-        cleaned_message = re.sub(r'[^\w\s\'\-/,.:!?]', '', message.text)
+        clean_message = re.sub(r'[^\w\s\'\-/,.:!?]', '', message)
 
-        print(f"  Text: {cleaned_message if cleaned_message else '[No text]'}")
+        print(f"  Text: {clean_message if clean_message else '[No text]'}")
 
         # TODO exceptions
         # try compound parser or if patterns not found, use separate parsers
+
+        potential_matches = []
+
+        for pattern in self.patterns:
+            matches = re.findall(pattern, clean_message)
+            potential_matches.extend(matches)
         
-        locations = self.location_extractor.get_location(cleaned_message)
-        return ParsedMessage(message.id, message.date, cleaned_message, locations)
+        #parsed_locations = self.location_extractor.get_location(clean_message)
+        print("POTENTIAL MATCHES")
+        print(potential_matches)
+        ''' return {
+            'clean_message': clean_message,
+            'locations': parsed_locations
+        }'''
