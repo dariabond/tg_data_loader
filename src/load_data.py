@@ -13,13 +13,15 @@ api_hash = os.getenv('TELEGRAM_API_HASH')
 phone = os.getenv('TELEGRAM_PHONE')
 DATA_SOURCE = os.getenv('DATA_SOURCE', 'local')
 
+
 async def load_local_data(): 
     path = Path("test/messages.txt")
     with open(path, encoding="utf-8") as f:
         lines = [line.strip() for line in f if line.strip()]
     return lines
 
-async def fetch_api_data():
+
+async def fetch_api_data(client, channel, hours=24, limit=20):
     cutoff_time = datetime.now() - timedelta(hours=hours)
     messages = []
     async for message in client.iter_messages(
@@ -28,16 +30,15 @@ async def fetch_api_data():
         limit=limit,
         reverse=True
     ):
-        messages.append(message)
+        messages.append(message.message)
     return messages
 
 
-#how async works?
-def get_messages(client, channel, hours=24, limit=20):
+def get_messages(client, channel, hours):
     if DATA_SOURCE == 'local':
         return load_local_data()
     elif DATA_SOURCE == 'api':
-        return fetch_api_data()
+        return fetch_api_data(client, channel, hours)
     else:
         raise ValueError(f"Unknown data source: {config.DATA_SOURCE}")
 
@@ -54,11 +55,8 @@ async def test_telegram():
         
         messages = await get_messages(client, channel, hours=24)
         for message in messages:
-
-            # should I use my parsedmessage class here?
             res = parser.parse(message)
-            print("RESULT OF PARSING")
-            print(res)
+            print()
             
     except Exception as e:
         print(f"✗ Error: {e}")
