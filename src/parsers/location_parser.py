@@ -4,10 +4,40 @@ from .parser_config import PARSER_CONFIG
 from .models import Location
 import time
 
-# extract threat first and slice the text
-
 class LocationParser: 
     def __init__(self):
+
+        # Direction patterns
+        self.direction_pattern = re.compile(
+            r'(?:на|з|із|зі|від|у напрямку|курс)\s+'
+            r'(північ(?:н[а-я]+)?|схід(?:н[а-я]+)?|південь|південн[а-я]+|'
+            r'захід(?:н[а-я]+)?|західн[а-я]+|'
+            r'північно-східн[а-я]+|південно-східн[а-я]+|'
+            r'північно-західн[а-я]+|південно-західн[а-я]+)',
+            re.IGNORECASE
+        )
+
+
+        # Oblast pattern 
+        # Matches: Сумщині, Харківщині, Дніпропетровщині, etc.
+        self.oblast_pattern = re.compile(
+            r'\b([А-ЯІЇЄҐ][а-яіїєґ]+(?:ськ|цьк|зьк)?(?:щин|ччин)[іаиуюї]?)\b'
+        )
+
+
+        # Full oblast pattern
+        # Matches: Сумська область, Харківська область
+        self.oblast_full_pattern = re.compile(
+            r'\b([А-ЯІЇЄҐ][а-яіїєґ]+(?:ська|цька|зька)) область\b'
+        )
+
+        # City patterns 
+        # Matches: на Суми, на Охтирку, на Дніпро
+        self.city_on_pattern = re.compile(
+            r'\bна\s+([А-ЯІЇЄҐ][а-яіїєґ\']+(?:(?:-[А-ЯІЇЄҐ][а-яіїєґ]+)|(?:ськ[а-яіїєґ]*)|(?:цьк[а-яіїєґ]*))?[а-яіїєґу]?)\b'
+        )
+
+
         self.geolocator = Nominatim(user_agent="telegram_scraper_v1")
         self.patterns = []
         prepositions = '|'.join(PARSER_CONFIG['prepos_space'])
@@ -41,20 +71,24 @@ class LocationParser:
         
         return None
 
+
     def get_location(self, text):
-        print(f'Extracting location from message :{text}')
-        potential_locations = []
+        locations = set()
 
-        for pattern in self.patterns:
-            matches = re.findall(pattern, text)
-            potential_locations.extend(matches)
+        # parse oblast 
+        for match in self.oblast_pattern.finditer(text): 
+            oblast = match.group(1)
+            locations.add(oblast)
 
-        locations = []
-        """for item in potential_locations: 
-            print(f"Geocoded locations")
-            print(self._geocode_location(item))"""
-            
+        for match in self.oblast_full_pattern.finditer(text): 
+            oblast = match.group(1)
+            locations.add(oblast)
 
-        print(potential_locations)
+        # parse city
+        for match in self.city_on_pattern.finditer(text): 
+            city = match.group(1)
+            locations.add(city)
 
-        return potential_locations
+        print(locations)
+
+        return list(locations)
