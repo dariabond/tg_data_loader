@@ -1,6 +1,5 @@
 import re
 from geopy.geocoders import Nominatim
-from .models import Location
 import time
 
 # TODO 
@@ -87,8 +86,7 @@ class LocationParser:
         return None
 
 
-# TODO make some patterns optional
-    def get_location(self, text):
+    def get_locations(self, text):
         locations = set()
 
         # parse settlement

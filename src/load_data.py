@@ -60,7 +60,8 @@ async def test_telegram():
             print(
                 f"Raw: {message}\n"
                 f"Clean: {res['clean_message']}\n"
-                f"Locations: {', '.join(res['locations'])}"
+                f"Locations: {', '.join(res['locations'])}\n"
+                f"Threats: {', '.join(res['threats'])}"
             )
             
     except Exception as e:
