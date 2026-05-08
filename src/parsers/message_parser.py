@@ -10,7 +10,6 @@ class MessageParser:
         # leave only latin, cyrillic and digits
         clean_message = re.sub(r'[^\w\s\'\-/,.:!?]', '', message)
         clean_message = re.sub(r'\s+', ' ', clean_message).strip()
-        print(f"  Text: {clean_message if clean_message else '[No text]'}")
 
         # TODO here we should filter invalid messages. but In this case what is to be returned?
 

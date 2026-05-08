@@ -40,7 +40,7 @@ def get_messages(client, channel, hours):
     elif DATA_SOURCE == 'api':
         return fetch_api_data(client, channel, hours)
     else:
-        raise ValueError(f"Unknown data source: {config.DATA_SOURCE}")
+        raise ValueError(f"Unknown data source")
 
 
 async def test_telegram():
@@ -57,6 +57,11 @@ async def test_telegram():
         for message in messages:
             res = parser.parse(message)
             print()
+            print(
+                f"Raw: {message}\n"
+                f"Clean: {res['clean_message']}\n"
+                f"Locations: {', '.join(res['locations'])}"
+            )
             
     except Exception as e:
         print(f"✗ Error: {e}")

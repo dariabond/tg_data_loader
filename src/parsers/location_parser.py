@@ -1,6 +1,5 @@
 import re
 from geopy.geocoders import Nominatim
-from .parser_config import PARSER_CONFIG
 from .models import Location
 import time
 
@@ -65,17 +64,6 @@ class LocationParser:
             r'\bна\s+([А-ЯІЇЄҐ][а-яіїєґ\']+(?:(?:-[А-ЯІЇЄҐ][а-яіїєґ]+)|(?:ськ[а-яіїєґ]*)|(?:цьк[а-яіїєґ]*))?[а-яіїєґу]?)\b'
         )
 
-        self.geolocator = Nominatim(user_agent="telegram_scraper_v1")
-        self.patterns = []
-        prepositions = '|'.join(PARSER_CONFIG['prepos_space'])
-
-        self.patterns.extend([
-            PARSER_CONFIG['pattern_prepos'].format(
-                prepositions=prepositions
-            ),
-            PARSER_CONFIG['pattern_postpos']
-        ])
-
     # this method verifies if text is real location and returns 
     # normalized settlement name, latitude, longitude
     def _geocode_location(self, text): 
@@ -112,5 +100,5 @@ class LocationParser:
             oblast = match.group(1)
             locations.add(oblast)
 
-        print(locations)
+        #print(locations)
         return list(locations)

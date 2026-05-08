@@ -87,3 +87,6 @@ venv/
 
 # VS Code
 .vscode/
+
+# Personal notes 
+notes.txt
