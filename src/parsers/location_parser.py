@@ -1,6 +1,7 @@
 import re
 from geopy.geocoders import Nominatim
 import time
+import json
 
 # TODO 
 # create oblast config to normalize oblast
@@ -86,8 +87,24 @@ class LocationParser:
         return None
 
 
+    # takes text that represents location(oblast/settlement) and returns corresponding normalized
+    # oblast i.e. харківщині -> kharkiv or київ -> kyiv as a capital is a special case
+    # TODO what about '
+    # should I change representation of the json here? 
+    def _normalize_location(self, text: str, oblast_config: dict) -> str|None: 
+        text = text.lower()
+
+        for obl_key, obl_data in oblast_config.items():
+            stems = obl_data.get("relat_stems", [])
+            for stem in stems:
+                if stem in text:
+                    return obl_key
+        return None
+
+
     def get_locations(self, text):
         locations = set()
+        oblasts = set()
 
         # parse settlement
         matches =  self.direction_settlement_pattern.findall(text)
@@ -98,5 +115,18 @@ class LocationParser:
             oblast = match.group(1)
             locations.add(oblast)
 
-        #print(locations)
-        return list(locations)
+        if not locations:
+            return []
+
+        oblast_config = {}
+        with open("src/parsers/oblast_config.json", encoding="utf-8") as f:
+            oblast_config = json.load(f)
+
+        # map settlement/oblast to normalized oblast name
+        for location in locations: 
+            oblast = self._normalize_location(location, oblast_config)
+            if oblast is not None:
+                oblasts.add(oblast)
+
+        print(locations)
+        return list(oblasts)
