@@ -79,3 +79,6 @@ dmypy.json
 
 # Personal notes 
 notes.txt
+
+# Temporary data
+/data

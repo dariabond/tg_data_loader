@@ -14,6 +14,7 @@ services:
     env_file: .env
     volumes:
       - ./src:/app/src
+      - ./data:/app/data
       - ./sessions:/app/sessions
       - ./test:/app/test
     stdin_open: true

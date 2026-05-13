@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 from datetime import datetime, timedelta, timezone
 from parsers.message_parser import MessageParser
 from pathlib import Path
+import json
+from pathlib import Path
 
 load_dotenv()
 
@@ -12,6 +14,9 @@ api_id = os.getenv('TELEGRAM_API_ID')
 api_hash = os.getenv('TELEGRAM_API_HASH')
 phone = os.getenv('TELEGRAM_PHONE')
 DATA_SOURCE = os.getenv('DATA_SOURCE', 'local')
+BASE_DIR = Path(__file__).resolve().parent      # src/
+PROJECT_ROOT = BASE_DIR.parent                  # project/
+RAW_DATA_PATH = PROJECT_ROOT / "data" / "raw_messages.jsonl"
 
 
 async def load_local_data(): 
@@ -31,7 +36,6 @@ async def fetch_api_data(client, channel, hours=24, limit=20):
         reverse=True
     ):
         #print(message.date.isoformat())
-        #print(message.date.isoformat())
         messages.append(message.message)
     return messages
 
@@ -45,37 +49,62 @@ def get_messages(client, channel, hours, limit):
         raise ValueError(f"Unknown data source")
 
 
-async def test_telegram():
+def write_jsonl(path: str, records: list[dict]) -> None:
+    print(path)
+    path = Path(path)
+
+    print("Writing to:", path.resolve())
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with open(path, "a", encoding="utf-8") as f:
+            for record in records:
+                f.write(json.dumps(record, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print("WRITE FAILED:", e)
+
+
+def serialize_message(msg: str) -> dict:
+    return {
+        "id": msg.id,
+        "channel_id": getattr(msg.peer_id, "channel_id", None),
+        "date": msg.date.isoformat() if msg.date else None,
+        "message": msg.message,
+        "ingested_at": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+async def fetch_messages(client, channel_username: str, hours=24, limit=50) -> list:
+    channel = await client.get_entity(channel_username)
+    cutoff_time = datetime.now() - timedelta(hours=hours)
+    messages = []
+    async for message in client.iter_messages(
+        channel, 
+        offset_date=cutoff_time,
+        limit=limit,
+        reverse=True
+    ):
+        messages.append(serialize_message(message))
+    return messages
+    
+
+async def main():
     client = TelegramClient('sessions/test_session', api_id, api_hash)
     await client.start(phone=phone)
     channel_username = os.getenv('TG_CHANNEL')
-    parser = MessageParser()
 
     try:
-        channel = await client.get_entity(channel_username)
-        
-        messages = await get_messages(client, channel, hours=24, limit=50)
-        for message in messages:
-            res = parser.parse(message)
-            print()
-            print(
-                f"Raw: {message}\n"
-                f"Clean: {res['clean_message']}\n"
-                f"Oblasts: {', '.join(res['oblasts'])}\n"
-                f"Threats: {', '.join(res['threats'])}"
-            )
-
-        #TODO 
-        # filter out messages that were not parsed and put them in different location for further investigation
-            
+        raw_messages = await fetch_messages(client, channel_username)
+        # print(raw_messages)
+        write_jsonl(RAW_DATA_PATH, raw_messages)
     except Exception as e:
         print(f"✗ Error: {e}")
-    
-    await client.disconnect()
+    finally:
+        await client.disconnect()
 
 
 if __name__ == '__main__':
-    asyncio.run(test_telegram())
+    asyncio.run(main())
 
 
     """TODO
