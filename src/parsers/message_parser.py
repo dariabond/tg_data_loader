@@ -19,6 +19,6 @@ class MessageParser:
         #TODO add timestamp
         return {
             'clean_message': clean_message,
-            'locations': locations,
+            'oblasts': locations,
             'threats': threats
         }

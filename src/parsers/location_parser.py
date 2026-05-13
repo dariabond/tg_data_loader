@@ -107,7 +107,7 @@ class LocationParser:
         oblasts = set()
 
         # parse settlement
-        matches =  self.direction_settlement_pattern.findall(text)
+        matches = self.direction_settlement_pattern.findall(text)
         locations.update(matches)
         
         # parse oblast 
@@ -128,5 +128,4 @@ class LocationParser:
             if oblast is not None:
                 oblasts.add(oblast)
 
-        print(locations)
         return list(oblasts)

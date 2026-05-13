@@ -2,7 +2,7 @@ import asyncio
 from telethon import TelegramClient
 import os
 from dotenv import load_dotenv
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from parsers.message_parser import MessageParser
 from pathlib import Path
 
@@ -30,15 +30,17 @@ async def fetch_api_data(client, channel, hours=24, limit=20):
         limit=limit,
         reverse=True
     ):
+        #print(message.date.isoformat())
+        #print(message.date.isoformat())
         messages.append(message.message)
     return messages
 
 
-def get_messages(client, channel, hours):
+def get_messages(client, channel, hours, limit):
     if DATA_SOURCE == 'local':
         return load_local_data()
     elif DATA_SOURCE == 'api':
-        return fetch_api_data(client, channel, hours)
+        return fetch_api_data(client, channel, hours, limit)
     else:
         raise ValueError(f"Unknown data source")
 
@@ -51,18 +53,20 @@ async def test_telegram():
 
     try:
         channel = await client.get_entity(channel_username)
-        cutoff_time = datetime.now() - timedelta(hours=8)
         
-        messages = await get_messages(client, channel, hours=24)
+        messages = await get_messages(client, channel, hours=24, limit=50)
         for message in messages:
             res = parser.parse(message)
             print()
             print(
                 f"Raw: {message}\n"
                 f"Clean: {res['clean_message']}\n"
-                f"Locations: {', '.join(res['locations'])}\n"
+                f"Oblasts: {', '.join(res['oblasts'])}\n"
                 f"Threats: {', '.join(res['threats'])}"
             )
+
+        #TODO 
+        # filter out messages that were not parsed and put them in different location for further investigation
             
     except Exception as e:
         print(f"✗ Error: {e}")
@@ -72,6 +76,7 @@ async def test_telegram():
 
 if __name__ == '__main__':
     asyncio.run(test_telegram())
+
 
     """TODO
     # today
