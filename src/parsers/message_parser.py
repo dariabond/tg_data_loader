@@ -16,7 +16,6 @@ class MessageParser:
         locations = self.location_parser.get_locations(clean_message)
         threats = self.threat_parser.get_threats(clean_message)
 
-        #TODO add timestamp
         return {
             'clean_message': clean_message,
             'oblasts': locations,

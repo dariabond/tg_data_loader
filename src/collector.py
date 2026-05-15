@@ -3,7 +3,7 @@ import json
 
 def write_jsonl(path: str, records: list[dict]) -> None:
     try:
-        with open(path, "a", encoding="utf-8") as f:
+        with open(path, "w", encoding="utf-8") as f:
             for record in records:
                 f.write(json.dumps(record, ensure_ascii=False) + "\n")
     except Exception as e:

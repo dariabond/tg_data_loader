@@ -3,7 +3,9 @@ from telethon import TelegramClient
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+import traceback
 from collector import fetch_messages, write_jsonl
+from processor import process_messages
 
 load_dotenv()
 
@@ -24,8 +26,12 @@ async def main():
         raw_messages = await fetch_messages(client, channel_username)
         # print(raw_messages)
         write_jsonl(RAW_DATA_PATH, raw_messages)
+        processed_messages = process_messages(RAW_DATA_PATH)
+        print(processed_messages)
+
     except Exception as e:
         print(f"✗ Error: {e}")
+        traceback.print_exc()
     finally:
         await client.disconnect()
 
@@ -35,19 +41,7 @@ if __name__ == '__main__':
 
 
     """TODO
-    # today
-    # clean messages from images and odd words
-    # create docker db setup and tables: event, settlement, threat_type
-    
-    # how to connect and manipulate data in project?
-
-    # identify one or multiple threats and cut it off(to avoid this case 🛵🛸 Активність ворожих розвідувальних та ударних БпЛА на півночі Харківщини.
-['Миколаєвом', 'Сумському', 'Криворізькому', 'Харківщини', 'БпЛА в Сумському', 'БпЛА в Криворізькому'])
-    # create tests 
-    # exceptions to not take into account(fe messages that have image)
-    # extract settlement or region name Харкова -> Харків
-    # extract quantity
-    # think over the how to store settlements in db
+    # Database layer testing approach
      
     DB tables
     event
@@ -65,5 +59,3 @@ if __name__ == '__main__':
     - lat (R)
     - long (R)
     """
-
-    # ASK ABOUT ACCURACY!!!
